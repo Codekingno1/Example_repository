@@ -5,7 +5,7 @@ info:
     \ when pushed with github integration settings vs exported manually from swaggerhub.\
     \ \n"
   contact:
-    name: AZ_EAI_Governance_Product_Owners
+    name: AZ_EAI_Governance_Product_Owner
     url: https://inspirewellness.sharepoint.com/sites/EnterpriseAPIIntegration2
     email: EAI_Product_and_Portfolio_Team@humana.com
     x-owner-snow-group-name: Digital Enrollment Platform NPE Support
