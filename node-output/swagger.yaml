@@ -1,0 +1,285 @@
+openapi: 3.0.0
+info:
+  title: test
+  description: "Test for swaggerhub team to find out why the resolved file is different\
+    \ when pushed with github integration settings vs exported manually from swaggerhub.\
+    \ \n"
+  contact:
+    name: AZ_EAI_Governance_Product_Owners
+    url: https://inspirewellness.sharepoint.com/sites/EnterpriseAPIIntegration2
+    email: EAI_Product_and_Portfolio_Team@humana.com
+    x-owner-snow-group-name: Digital Enrollment Platform NPE Support
+    x-sre-team-name: DEP_System Team
+  version: 2.0.0
+  x-api-type: rest
+  x-classification: private
+  x-consumption-domain: internal
+  x-business-capability: enrollment
+  x-resource: consumers
+  x-segment: insurance
+  x-sub-segment: medicare
+  x-architecture-category: northstar
+servers:
+- url: "https://{serverName}/{apiVersion}/{basePath}"
+  description: The server URL for v2 Applications Search
+  variables:
+    serverName:
+      description: Name of the server
+      default: dev-hapi-ugw1.humana.com
+      enum:
+      - dev-hapi-ugw1.humana.com
+      - qa-hapi-ugw1.humana.com
+      - hapi-ugw1.humana.com
+    basePath:
+      description: Base path and folder for the API
+      default: enrollment-search
+    apiVersion:
+      description: API version in URL
+      default: v2
+security:
+- Apikey: []
+- OAuth2:
+  - Applications.*.Read
+  - Applications.*.Write
+paths:
+  /applications/search:
+    post:
+      tags:
+      - tes
+      summary: tst
+      description: |
+        test
+      parameters:
+      - name: offset
+        in: query
+        description: "Optional. This parameter is used to facilitate pagination of\
+          \ available results by providing an offset position to the results list.\
+          \ It can be sent by the consumer to indicate the starting point of the result\
+          \ set for the current call. The offset is a non-negative integer representing\
+          \ the first result to return. If not provided, it defaults the value of\
+          \ 0."
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 0
+      - name: limit
+        in: query
+        description: "Optional. Default is 50 records. This parameter is used to facilitate\
+          \ pagination by indicating a count of results to return in each page. The\
+          \ query parameter limit should be sent by the consumer to determine the\
+          \ number of results returned in the current call. The limit shall be a non-negative,\
+          \ non-zero integer indicating the maximum number of results to return at\
+          \ one time."
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+        example: 50
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/applications-search-response'
+        required: true
+      responses:
+        "200":
+          description: status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/applications-search-response'
+components:
+  schemas:
+    apps-search-request-byApplicationId:
+      properties:
+        applicationId:
+          type: string
+    apps-search-request-byApplicationType:
+      properties:
+        applicationType:
+          type: string
+    apps-search-request-byApplicationStatus:
+      properties:
+        applicationStatus:
+          type: string
+          description: "Status of the application\n* Submitted  : when an application\
+            \ was received with an applicant's signature \n"
+          enum:
+          - Submitted
+          - Completed
+    apps-search-requuest-byCoveragePeriod:
+      properties:
+        coveragePeriod:
+          $ref: '#/components/schemas/effective-end-dates'
+    app-search-criteria-schema:
+      properties:
+        filters:
+          $ref: '#/components/schemas/appsearchcriteriaschema_filters'
+    applications-search-response:
+      allOf:
+      - $ref: '#/components/schemas/application-search-response'
+      - $ref: '#/components/schemas/application-search-paginations-response'
+      - $ref: '#/components/schemas/app-search-criteria-schema'
+    application-search-response:
+      properties:
+        applications:
+          type: array
+          items:
+            $ref: '#/components/schemas/applicationsearchresponse_applications'
+    application-search-paginations-response:
+      properties:
+        pagination:
+          $ref: '#/components/schemas/pagination-model'
+        links:
+          type: array
+          description: "Optional. A list of pagination links, if applicable"
+          items:
+            $ref: '#/components/schemas/link-model'
+    effective-end-dates:
+      properties:
+        effectiveDate:
+          type: string
+          description: "The effective date, YYYY-MM-DD ISO-8601 format."
+          format: date
+          example: 2023-01-01
+        endDate:
+          type: string
+          description: "The end date, YYYY-MM-DD ISO-8601 format."
+          format: date
+          example: 2024-01-01
+    producers:
+      properties:
+        producers:
+          type: array
+          description: A list of agents and brokers that the applicant worked with
+          items:
+            allOf:
+            - $ref: '#/components/schemas/producer-name'
+            - $ref: '#/components/schemas/producer-managing-general-agency'
+    producer-name:
+      properties:
+        producerName:
+          type: string
+          description: Name of an agent or a broker in one field
+          example: Danielle Hansen
+    producer-managing-general-agency:
+      properties:
+        managingGeneralAgency:
+          type: string
+          description: Managing General Agency will get an override comission
+    partner-marketing:
+      properties:
+        partnerAndMarketing:
+          $ref: '#/components/schemas/partnermarketing_partnerAndMarketing'
+    pagination-model:
+      properties:
+        offset:
+          type: integer
+          example: 0
+        limit:
+          type: integer
+          example: 20
+        countOfItems:
+          type: integer
+          example: 1000
+        countOfPages:
+          type: integer
+          example: 50
+      description: Pagination attributes
+    link-model:
+      properties:
+        rel:
+          type: string
+          description: Name of the sub-resource
+        href:
+          type: string
+          description: Path to the sub-resource
+    appsearchcriteriaschema_filters:
+      properties:
+        searchType:
+          type: string
+          enum:
+          - ByApplicationStatus
+          - ByApplicationId
+          - ByApplicationType
+          - ByCoveragePeriod
+      allOf:
+      - $ref: '#/components/schemas/apps-search-request-byApplicationId'
+      - $ref: '#/components/schemas/apps-search-requuest-byCoveragePeriod'
+      - $ref: '#/components/schemas/apps-search-request-byApplicationType'
+      - $ref: '#/components/schemas/apps-search-request-byApplicationStatus'
+    applicationsearchresponse_applications:
+      properties:
+        applicationId:
+          type: string
+        applicationStatus:
+          type: string
+          example: Submitted
+      allOf:
+      - $ref: '#/components/schemas/producers'
+      - $ref: '#/components/schemas/partner-marketing'
+    partnermarketing_partnerAndMarketing:
+      type: object
+      properties:
+        partnerApplicationId:
+          type: string
+          description: Unique identifier of the application generated by a partner.
+        partnerId:
+          type: string
+          description: Partner Id
+        partnerName:
+          type: string
+          description: Name of the Partner
+        partnerLocationId:
+          type: string
+          description: Location of the Partner
+        marketingCampaign:
+          type: string
+          description: Marketing Campaign code
+  parameters:
+    offset:
+      name: offset
+      in: query
+      description: "Optional. This parameter is used to facilitate pagination of available\
+        \ results by providing an offset position to the results list. It can be sent\
+        \ by the consumer to indicate the starting point of the result set for the\
+        \ current call. The offset is a non-negative integer representing the first\
+        \ result to return. If not provided, it defaults the value of 0."
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+      example: 0
+    limit:
+      name: limit
+      in: query
+      description: "Optional. Default is 50 records. This parameter is used to facilitate\
+        \ pagination by indicating a count of results to return in each page. The\
+        \ query parameter limit should be sent by the consumer to determine the number\
+        \ of results returned in the current call. The limit shall be a non-negative,\
+        \ non-zero integer indicating the maximum number of results to return at one\
+        \ time."
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+      example: 50
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://login.microsoftonline.com/56c62bbe-8598-4b85-9e51-1ca753fa50f2/oauth2/v2.0/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations
+    Apikey:
+      type: apiKey
+      name: x-apikey
+      in: header
